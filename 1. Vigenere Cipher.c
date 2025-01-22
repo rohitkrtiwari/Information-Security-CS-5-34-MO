@@ -1,16 +1,26 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<stdbool.h>
+
+char space[] = {'@', '#', '&', '_', '+', '*'};
+
+bool isSpace(char text){
+	for(size_t i = 0; i < sizeof(space); i++) if(space[i] == text) return true;
+	return false;
+}
 
 void encryptVigener(char *plainText, char *Key, char *CypherText, size_t m, size_t n){
-	for(size_t i = 0, j = 0; i < m && plainText[i]!='\0'; i++){
+	for(size_t i = 0, j = 0, k=0; i < m && plainText[i]!='\0'; i++){
                 if(plainText[i] >= 'A' && plainText[i] <= 'Z'){
                         CypherText[i] = ((plainText[i] - 'A' + (Key[j%n]-'a')) % 26) + 'A';
                         j++;
                 } else if(plainText[i] >= 'a' && plainText[i] <= 'z') {
                         CypherText[i] = ((plainText[i] - 'a' + (Key[j%n]-'a')) % 26) + 'a';
                         j++;
-                } else {
+                } else if(plainText[i] == ' ') {
+			CypherText[i] = space[k%sizeof(space)]; k++;
+		} else {
                         CypherText[i] = plainText[i];
                 }
         }
@@ -31,7 +41,9 @@ void decryptVigenere(char *CypherText, char* Key, size_t m, size_t n){
             		// Decrypt lowercase letters
             		plainText[i] = ((CypherText[i] - 'a' - (Key[j % n] - 'a') + 26) % 26) + 'a';
             		j++;  // Increment key index for each alphabetic character
-        	} else {
+        	} else if(isSpace(CypherText[i])){
+			plainText[i] = ' ';
+		} else {
             		// Non-alphabetic characters remain unchanged
             		plainText[i] = CypherText[i];
         	}
