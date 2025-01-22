@@ -49,7 +49,7 @@ void decryptVigenere(char *CypherText, char* Key, size_t m, size_t n){
         	}
     	}
     	plainText[m] = '\0';
-	printf("\nDecrpyted Text: %s", plainText);
+	printf("\nDecrpyted Text: %s\n", plainText);
 }
 
 int main(){
