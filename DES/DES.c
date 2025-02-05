@@ -19,7 +19,7 @@ void pad_string(char *input, size_t *len){
 
 
 // Function to convert string data to 64-bit blocks (Desgined for DES Processing)
-void toBlock(char *input, unsigned char **blocks, size_t *num_blocks){
+void toBlock(char *input, uint64_t **blocks, size_t *num_blocks){
 	size_t length = strlen(input);
 
 	// Pad the string if it's not a multiple of 8 Bytes
@@ -28,27 +28,47 @@ void toBlock(char *input, unsigned char **blocks, size_t *num_blocks){
 	// Calculate the number of 64-bit blocks
 	*num_blocks = length / DES_BLOCK_SIZE;
 
-	*blocks = (unsigned char *)malloc(length);
+	*blocks = (uint64_t *)malloc(*num_blocks*sizeof(uint64_t));
 
-	for(size_t i=0;i<length; i++) (*blocks)[i] = input[i];
+	// Convert each 8-byte segment into a 64-bit unsigned integer
+	for(size_t i=0;i<*num_blocks;i++){
+		(*blocks)[i] = 0;
+		for(size_t j=0;j<DES_BLOCK_SIZE; j++) (*blocks)[i] |= (uint64_t)(unsigned char)input[i * DES_BLOCK_SIZE + j] << (8 * (DES_BLOCK_SIZE - 1 - j));
+	}
+
+
 }
 
 // Function to print the 64-bit blocks in HExadecimal Format ( for debugging)
-void print_blocks(unsigned char *blocks, size_t num_blocks){
+void print_blocks(uint64_t *blocks, size_t num_blocks){
 	for(size_t i=0;i<num_blocks; i++){
 		printf("Blocks %zu: ", i+1);
-		for(int j=0;j<DES_BLOCK_SIZE;j++) printf("%02X", blocks[i*DES_BLOCK_SIZE +j]);
+		for(int j=63;j>=0;j--){
+			printf("%lu", (blocks[i] >> j) & 1);
+			if(j%8 == 0) printf(" ");
+		}
 		printf("\n");
 	}
 }
 
-int main() {
-    char str[] = "the main written part of a book, newspaper, etc. (not the pictures, notes, index, etc.) the written form of a speech, interview, etc.";
-    size_t len = strlen(str);
-    const char *key = "12345678";
+void rotate_left(uint64_t *block){
+	*block = (*block << 1) | (*block >> 63);
+}
 
-	unsigned char *blocks = NULL;
+int main() {
+	char str[] = "the main written part of a book, newspaper, etc. (not the pictures, notes, index, etc.) the written form of a speech, interview, etc.";
+	uint64_t *blocks = NULL;
 	size_t num_blocks = 0;
 	toBlock(str, &blocks, &num_blocks);
 	print_blocks(blocks, num_blocks);
+
+	printf("\nAfter Rotating left 1 bit: \n");
+	rotate_left(&blocks[0]);
+
+	// Print the modified blocks
+	print_blocks(blocks, num_blocks);
+
+	free(blocks);
+
+	return 0;
 }
