@@ -305,7 +305,7 @@ void reverse_subkeys(uint64_t subkeys[NUM_ROUNDS]) {
 }
 
 int main() {
-	char str[] = "the main written part of a book, newspaper, etc. (not the pictures, notes, index, etc.) the written form of a speech, interview, etc.";
+    char str[] = "the main written part of a book, newspaper, etc. (not the pictures, notes, index, etc.) the written form of a speech, interview, etc.";
 
     // Key Initialization
     uint64_t key = 0x133457799BBCDFF1;
